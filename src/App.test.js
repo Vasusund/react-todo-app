@@ -1,18 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 import Login from './components/Login';
-import { BrowserRouter } from 'react-router-dom';
 
+// Test for App – no BrowserRouter wrapping needed
 test('renders login heading', () => {
-  render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  );
+  render(<App />); // App already has Router
   const heading = screen.getByRole('heading', { name: /login/i });
   expect(heading).toBeInTheDocument();
 });
 
+// Test for Login component – wrap only this one
+import { BrowserRouter } from 'react-router-dom';
 test('login button exists', () => {
   render(
     <BrowserRouter>
