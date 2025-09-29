@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/Vasusund/react-todo-app.git/static/css/main.3982bb5f.css",
-    "main.js": "/Vasusund/react-todo-app.git/static/js/main.203c5cc5.js",
+    "main.js": "/Vasusund/react-todo-app.git/static/js/main.a58c92a2.js",
     "index.html": "/Vasusund/react-todo-app.git/index.html",
     "main.3982bb5f.css.map": "/Vasusund/react-todo-app.git/static/css/main.3982bb5f.css.map",
-    "main.203c5cc5.js.map": "/Vasusund/react-todo-app.git/static/js/main.203c5cc5.js.map"
+    "main.a58c92a2.js.map": "/Vasusund/react-todo-app.git/static/js/main.a58c92a2.js.map"
   },
   "entrypoints": [
     "static/css/main.3982bb5f.css",
-    "static/js/main.203c5cc5.js"
+    "static/js/main.a58c92a2.js"
   ]
 }
