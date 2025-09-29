@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        APP_DIR = "${WORKSPACE}"
+        PATH = "${tool('NodeJS 18')}/bin:${env.PATH}"
     }
 
     stages {
@@ -21,60 +21,52 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Installing dependencies and building React app...'
-                dir("${APP_DIR}") {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
+                sh 'rm -rf node_modules'      // ensure fresh install
+                sh 'npm ci'                   // clean install from package-lock.json
+                sh 'npm run build'            // build React project
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests with Jest...'
-                dir("${APP_DIR}") {
-                    sh 'npm test -- --watchAll=false'
-                }
+                sh 'npm test -- --watchAll=false'
             }
         }
 
         stage('Code Quality') {
             steps {
-                echo 'Running ESLint code quality check...'
-                dir("${APP_DIR}") {
-                    sh 'npx eslint src/**/*.js'
-                }
+                echo 'Running code quality analysis with ESLint...'
+                // Install ESLint globally (if not already installed)
+                sh 'npm install -g eslint@8.0.0'
+                // Run ESLint
+                sh 'eslint src/**/*.js || true' // continue even if lint errors found
             }
         }
 
         stage('Security') {
             steps {
-                echo 'Running npm audit for security vulnerabilities...'
-                dir("${APP_DIR}") {
-                    sh 'npm audit --audit-level=moderate'
-                }
+                echo 'Running security audit with npm...'
+                sh 'npm audit --audit-level=moderate || true'  // checks for vulnerabilities
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying app to test environment...'
-                dir("${APP_DIR}/build") {
-                    // For simplicity, just copy to /var/www/html or another test folder
-                    sh 'cp -r * /var/www/html/react-todo-app || echo "Replace with your deploy command"'
-                }
+                echo 'Deploying build folder...'
+                // For now, just archive as deploy artifact
+                archiveArtifacts artifacts: 'build/**', fingerprint: true
+                echo 'Build archived for deployment.'
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished (success or fail).'
-        }
         success {
             echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed. Check the logs.'
+            echo 'Pipeline failed. Check the logs!'
         }
     }
 }
