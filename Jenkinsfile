@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 18'   // Must match the NodeJS installation name in Jenkins
+        nodejs 'NodeJS 18'   
     }
 
     environment {
@@ -21,9 +21,10 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Installing dependencies and building React app...'
-                sh 'rm -rf node_modules'      // ensure fresh install
-                sh 'npm ci'                   // clean install from package-lock.json
-                sh 'npm run build'            // build React project
+                sh 'rm -rf node_modules'
+                sh 'npm ci'
+                sh 'npm install react-router-dom@6.17.0' 
+                sh 'npm run build'
             }
         }
 
@@ -36,27 +37,23 @@ pipeline {
 
         stage('Code Quality') {
             steps {
-                echo 'Running code quality analysis with ESLint...'
-                // Install ESLint globally (if not already installed)
+                echo 'Running ESLint...'
                 sh 'npm install -g eslint@8.0.0'
-                // Run ESLint
-                sh 'eslint src/**/*.js || true' // continue even if lint errors found
+                sh 'eslint src/**/*.js || true'
             }
         }
 
         stage('Security') {
             steps {
-                echo 'Running security audit with npm...'
-                sh 'npm audit --audit-level=moderate || true'  // checks for vulnerabilities
+                echo 'Running npm audit for security vulnerabilities...'
+                sh 'npm audit --audit-level=moderate || true'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying build folder...'
-                // For now, just archive as deploy artifact
+                echo 'Archiving build folder...'
                 archiveArtifacts artifacts: 'build/**', fingerprint: true
-                echo 'Build archived for deployment.'
             }
         }
     }
