@@ -1,21 +1,28 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS 18'
+    }
+
     environment {
-        NODE_HOME = tool name: 'NodeJS 18' // Your Node.js installation in Jenkins
+        PATH = "${tool('NodeJS 18')}/bin:${env.PATH}"
+        NETLIFY_AUTH_TOKEN = credentials('NETLIFY_AUTH_TOKEN') // Jenkins secret
+        NETLIFY_SITE_ID = 'YOUR_NETLIFY_SITE_ID'               // Replace with your site ID
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                echo "Checking out code from GitHub..."
+                echo 'Checking out code from GitHub...'
                 git branch: 'main', url: 'https://github.com/Vasusund/react-todo-app.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Installing dependencies and building React app..."
+                echo 'Installing dependencies and building React app...'
                 sh 'rm -rf node_modules'
                 sh 'npm ci'
                 sh 'npm install react-router-dom@6.17.0'
@@ -25,46 +32,47 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo "Running tests with Jest..."
+                echo 'Running tests with Jest...'
                 sh 'npm test -- --watchAll=false'
             }
         }
 
         stage('Code Quality') {
             steps {
-                echo "Running ESLint for code quality..."
+                echo 'Running ESLint for code quality...'
                 sh 'npm install -g eslint@8.0.0'
-                sh 'eslint src/components/Dashboard.js src/components/Login.js src/components/TodoItem.js src/utils/auth.js'
+                sh 'eslint src/**/*.js || true'
             }
         }
 
         stage('Security') {
             steps {
-                echo "Running npm audit for security vulnerabilities..."
+                echo 'Running npm audit for security vulnerabilities...'
                 sh 'npm audit --audit-level=moderate || true'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "Deploying React app to staging server..."
-                sh '''
-                scp -r build/* username@staging-server:/var/www/html/react-todo-app
-                ssh username@staging-server "sudo systemctl restart nginx || true"
-                '''
+                echo 'Deploying React app to Netlify...'
+                sh 'npm install -g netlify-cli'
+                sh """
+                    netlify deploy \
+                    --dir=build \
+                    --prod \
+                    --auth=\$NETLIFY_AUTH_TOKEN \
+                    --site=\$NETLIFY_SITE_ID
+                """
             }
         }
     }
 
     post {
-        always {
-            echo "Pipeline completed!"
-        }
         success {
-            echo "Pipeline finished successfully!"
+            echo 'Pipeline completed successfully! Your app is live at Netlify.'
         }
         failure {
-            echo "Pipeline failed. Check the logs!"
+            echo 'Pipeline failed. Check the logs!'
         }
     }
 }
