@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 18'   
+        nodejs 'NodeJS 18'
     }
 
     environment {
@@ -23,7 +23,7 @@ pipeline {
                 echo 'Installing dependencies and building React app...'
                 sh 'rm -rf node_modules'
                 sh 'npm ci'
-                sh 'npm install react-router-dom@6.17.0' 
+                sh 'npm install react-router-dom@6.17.0'
                 sh 'npm run build'
             }
         }
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Code Quality') {
             steps {
-                echo 'Running ESLint...'
+                echo 'Running ESLint for code quality...'
                 sh 'npm install -g eslint@8.0.0'
                 sh 'eslint src/**/*.js || true'
             }
