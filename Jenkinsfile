@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 18'   // Your installed NodeJS tool in Jenkins
+        nodejs 'NodeJS 18'   
     }
 
     environment {
@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out code from GitHub...'
-                git branch: 'main', url: 'https://github.com/Vasusund/react-todo-app.git'
+                git branch: 'main', url: 'https://github.com/Vasusund/7.3H-SIT223.git'
             }
         }
 
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 echo 'Running ESLint for code quality...'
                 sh 'npm install -g eslint@8.0.0'
-                sh 'eslint src/**/*.js || true'     // Run ESLint and continue even if there are warnings
+                sh 'eslint src/**/*.js || true'     // Run ESLint 
             }
         }
 
@@ -48,8 +48,7 @@ pipeline {
             steps {
                 echo 'Running npm audit for security vulnerabilities...'
                 sh 'npm audit --audit-level=moderate || true'
-                // Note: If vulnerabilities are found, you can fix them locally by running:
-                // npm audit fix --force
+                
             }
         }
 
@@ -57,7 +56,7 @@ pipeline {
             steps {
                 echo 'Deploying React app to GitHub Pages...'
                 sh 'npm install -g gh-pages'
-                sh 'npm run deploy'   // Automatically pushes build folder to gh-pages branch
+                sh 'npm run deploy'  
             }
         }
     }
